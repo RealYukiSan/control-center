@@ -35,14 +35,13 @@ async function recursion() {
 		const param = `timeout=300&offset=${last_message}`;
 		const response = await fetch(`${process.env.BASE_URL}/getUpdates?${param}`)
 			.then(res => res.json())
-		if (response.ok) {
-			if (response.result.length) {
-				const message = response.result[response.result.length - 1];
-				last_message = message.update_id + 1;
-				console.log(message);
-			}
-			recursion();
+		if (response.ok && response.result.length) {
+			const message = response.result[response.result.length - 1];
+			last_message = message.update_id + 1;
+			console.log(message);
 		} else console.log(response)
+
+		recursion();
 	} catch(err) {
 		console.log(err)
 	}
