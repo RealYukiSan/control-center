@@ -21,7 +21,6 @@ child.stdout.on('data', (data) => {
 				const param = `chat_id=5599651385&parse_mode=MarkdownV2&text=${error}`;
 				fetch(`${process.env.BASE_URL}/sendMessage?${param}`)
 					.catch(console.log)
-					.then(res => res.json())
 					.then(res => process.exit());
 			}
 		});
