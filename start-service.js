@@ -9,13 +9,14 @@ const http = spawn('gwrok', ['client', '--target-addr', '127.0.0.1', '--target-p
 const ssh = spawn('gwrok', ['client', '--target-addr', '127.0.0.1', '--target-port', process.env.SSH_PORT, '--server-addr', process.env.GWROK_IP, '--server-port', '9999']);
 
 let last_update = '';
-async function recursion() {
+async function handler() {
   try {
     const param = `timeout=300&offset=${last_update}`;
     const response = await fetch(`${process.env.BASE_URL}/getUpdates?${param}`, { keepalive: true, signal: AbortSignal.timeout(1000 * 300) }).then(res => res.json())
 
     if (response.ok && response.result.length) {
       const update = response.result[response.result.length - 1];
+      if (update.id != process.env.OWNER_ID) return
       last_update = update.update_id + 1;
       const last_tracked = fs.readFileSync("./track_message");
       if (last_tracked.toString() < last_update) {
@@ -39,7 +40,7 @@ async function recursion() {
 }
 
 setInterval(() => {
-  recursion();
+  handler();
 }, 1000);
 
 ssh.stdout.on('data', (data) => {
