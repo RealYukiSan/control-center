@@ -41,7 +41,7 @@ async function handler() {
 
 setInterval(() => {
   handler();
-}, 1000);
+}, 1000 * process.env.HANDLER_TIMEOUT);
 
 ssh.stdout.on('data', (data) => {
   if (data.toString().startsWith('Excellent')) {
