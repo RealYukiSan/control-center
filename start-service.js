@@ -22,15 +22,32 @@ async function handler() {
       if (last_tracked.toString() < last_update) {
         fs.writeFileSync('./track_message', last_update.toString(), { flag: 'w' });
         const prompt = update.message.text.replace(/\s{2,}/g, ' ').split(" ");
-        if (prompt[0].startsWith('exec') && prompt.length > 1) {
-          const child = spawn(prompt[1], prompt.splice(2));
-          let output = '';
-          child.stdout.on('data', (chunk) => output += chunk);
-          child.stdout.on('end', () => {
-            const text = encodeURIComponent(escapeSpecialChar(output));
-            const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=${text}`;
-            fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(console.log).then(res => res.json()).then(console.log);				
-          });
+        if (prompt.length > 1) {
+          let output;
+          switch (prompt[0]) {
+            case "exec":
+              const exec = spawn(prompt[1], prompt.splice(2));
+              output = '';
+              exec.stdout.on('data', (chunk) => output += chunk);
+              exec.stdout.on('end', () => {
+                const text = encodeURIComponent(escapeSpecialChar(output));
+                const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=${text}`;
+                fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(console.log).then(res => res.json()).then(console.log);				
+              });
+              break;
+              case "sudo":
+                const sudo = spawn('sh', ['-c', `echo ${process.env.SUDO_PW} | sudo -S ${prompt.splice(1).join(' ')}`]);
+                output = '';
+                sudo.stdout.on('data', (chunk) => output += chunk);
+                sudo.stdout.on('end', () => {
+                  const text = encodeURIComponent(escapeSpecialChar(output));
+                  const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=${text}`;
+                  fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(console.log).then(res => res.json()).then(console.log);				
+                });
+              break;
+            default:
+              break;
+          }          
         }
       }
     }
