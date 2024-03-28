@@ -12,7 +12,7 @@ let last_update = '';
 async function handler() {
   try {
     const param = `timeout=150&offset=${last_update}`;
-    const response = await fetch(`${process.env.BASE_URL}/getUpdates?${param}`, { keepalive: true, signal: AbortSignal.timeout(1000 * 200) }).then(res => res.json())
+    const response = await fetch(`${process.env.BASE_URL}/getUpdates?${param}`, { keepalive: true }).then(res => res.json())
 
     if (response.ok && response.result.length) {
       const update = response.result[response.result.length - 1];
@@ -44,39 +44,39 @@ setInterval(() => {
 }, 1000 * process.env.HANDLER_TIMEOUT);
 
 ssh.stdout.on('data', (data) => {
-  if (data.toString().startsWith('Excellent')) {
-    const port = data.toString().split(':')[2];
-    const ephPort = port.slice(0, port.indexOf('\n'));
-    const text = encodeURIComponent(`*SSH*\nIP \`${process.env.GWROK_IP.replace(/\./g, '\\.')}\`\nPort \`${ephPort}\``);
-    const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=${text}`;
-    fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(console.log)
+if (data.toString().startsWith('Excellent')) {
+const port = data.toString().split(':')[2];
+const ephPort = port.slice(0, port.indexOf('\n'));
+const text = encodeURIComponent(`*SSH*\nIP \`${process.env.GWROK_IP.replace(/\./g, '\\.')}\`\nPort \`${ephPort}\``);
+const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=${text}`;
+fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(console.log)
 
-    const intervalId = setInterval(() => keepAlive(ephPort, intervalId), 1000 * process.env.KEEPALIVE_TIMEOUT);
-  }
+const intervalId = setInterval(() => keepAlive(ephPort, intervalId), 1000 * process.env.KEEPALIVE_TIMEOUT);
+}
 });
 
 http.stdout.on('data', (data) => {
-  if (data.toString().startsWith('Excellent')) {
-    const port = data.toString().split(':')[2];
-    const ephPort = port.slice(0, port.indexOf('\n'));
-    const text = encodeURIComponent(`*HTTP*\nIP \`${process.env.GWROK_IP.replace(/\./g, '\\.')}\`\nPort \`${ephPort}\``);
-    const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=${text}`;
-    fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(console.log)
+if (data.toString().startsWith('Excellent')) {
+const port = data.toString().split(':')[2];
+const ephPort = port.slice(0, port.indexOf('\n'));
+const text = encodeURIComponent(`*HTTP*\nIP \`${process.env.GWROK_IP.replace(/\./g, '\\.')}\`\nPort \`${ephPort}\``);
+const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=${text}`;
+fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(console.log)
 
-    const intervalId = setInterval(() => keepAlive(ephPort, intervalId), 1000 * process.env.KEEPALIVE_TIMEOUT);
-  }
+const intervalId = setInterval(() => keepAlive(ephPort, intervalId), 1000 * process.env.KEEPALIVE_TIMEOUT);
+}
 });
 
 function keepAlive(port, intervalId) {
-  const socket = new net.Socket();
-  socket.setTimeout(1000);
-  socket.connect(port, process.env.GWROK_IP, () => socket.destroy())
-  socket.on("timeout", () => {
-    clearInterval(intervalId)
-    const error = encodeURIComponent('*Alert*: something went wrong\\!\nPlease check your mini\\-serper \\>///<');
-    const param = `chat_id=5599651385&parse_mode=MarkdownV2&text=${error}`;
-    fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(console.log)
-  });
+const socket = new net.Socket();
+socket.setTimeout(1000);
+socket.connect(port, process.env.GWROK_IP, () => socket.destroy())
+socket.on("timeout", () => {
+clearInterval(intervalId)
+const error = encodeURIComponent('*Alert*: something went wrong\\!\nPlease check your mini\\-serper \\>///<');
+const param = `chat_id=5599651385&parse_mode=MarkdownV2&text=${error}`;
+fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(console.log)
+});
 }
 
 function escapeSpecialChar(text) {
