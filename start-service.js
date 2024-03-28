@@ -26,7 +26,7 @@ async function handler() {
           let output;
           switch (prompt[0]) {
             case "exec":
-              const exec = spawn(prompt[1], prompt.splice(2));
+              const exec = spawn('sh', ['-c', prompt.splice(1).join(' ')]);
               output = '';
               exec.stdout.on('data', (chunk) => output += chunk);
               exec.stdout.on('end', () => {
