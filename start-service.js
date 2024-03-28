@@ -97,6 +97,7 @@ fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(console.log)
 }
 
 function escapeSpecialChar(text) {
-  const regex = /[_*\[\]~`()>\#\-={}|!.]/g;
+  // '_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'
+  const regex = /[\_\*\[\]\~\`\(\)\>\#\+\-\=\{\}\|\!\.]/g;
   return text.replace(regex, '\\$&');
 }
