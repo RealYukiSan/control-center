@@ -20,7 +20,7 @@ async function handler() {
       last_update = update.update_id + 1;
       const last_tracked = fs.readFileSync("./track_message");
       if (last_tracked.toString() < last_update) {
-        fs.writeFileSync('./track_message', last_update.toString());
+        fs.writeFileSync('./track_message', last_update.toString(), { flag: 'w' });
         const prompt = update.message.text.replace(/\s{2,}/g, ' ').split(" ");
         if (prompt[0].startsWith('exec') && prompt.length > 1) {
           const child = spawn(prompt[1], prompt.splice(2));
