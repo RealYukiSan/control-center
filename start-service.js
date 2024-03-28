@@ -2,76 +2,83 @@
 
 const { spawn } = require('node:child_process');
 const net = require("node:net");
-
+const fs = require("node:fs");
 require('dotenv').config();
 
-// const http = spawn('gwrok', ['client', '--target-addr', '127.0.0.1', '--target-port', process.env.HTTP_PORT, '--server-addr', process.env.GWROK_IP, '--server-port', '9999']);
+const http = spawn('gwrok', ['client', '--target-addr', '127.0.0.1', '--target-port', process.env.HTTP_PORT, '--server-addr', process.env.GWROK_IP, '--server-port', '9999']);
 const ssh = spawn('gwrok', ['client', '--target-addr', '127.0.0.1', '--target-port', process.env.SSH_PORT, '--server-addr', process.env.GWROK_IP, '--server-port', '9999']);
 
-let last_message;
+let last_update = '';
 async function recursion() {
-	try {
-		const param = `timeout=300&offset=${last_message}`;
-		const response = await fetch(`${process.env.BASE_URL}/getUpdates?${param}`)
-			.then(res => res.json())
-		if (response.ok && response.result.length) {
-			const message = response.result[response.result.length - 1];
-			last_message = message.update_id + 1;
-			console.log(message);
-		} else console.log(response)
+  try {
+    const param = `timeout=300&offset=${last_update}`;
+    const response = await fetch(`${process.env.BASE_URL}/getUpdates?${param}`, { keepalive: true, signal: AbortSignal.timeout(1000 * 300) }).then(res => res.json())
 
-		recursion();
-	} catch(err) {
-		console.log(err)
-	}
+    if (response.ok && response.result.length) {
+      const update = response.result[response.result.length - 1];
+      last_update = update.update_id + 1;
+      const last_tracked = fs.readFileSync("./track_message");
+      if (last_tracked.toString() < last_update) {
+        fs.writeFileSync('./track_message', last_update.toString());
+        const prompt = update.message.text.replace(/\s{2,}/g, ' ').split(" ");
+        if (prompt[0].startsWith('exec') && prompt.length > 1) {
+          const child = spawn(prompt[1], prompt.splice(2));
+          let output = '';
+          child.stdout.on('data', (chunk) => output += chunk);
+          child.stdout.on('end', () => {
+            const text = encodeURIComponent(escapeSpecialChar(output));
+            const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=${text}`;
+            fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(console.log).then(res => res.json()).then(console.log);				
+          });
+        }
+      }
+    }
+  } catch(err) {
+    console.log(err)
+  }
 }
 
-// recursion();
-
-// http.stdout.on('data', (data) => {
-//         if (data.toString().startsWith('Excellent')) {
-// 		const ephPort = data.toString().split(':')[2];
-// 		const text = encodeURIComponent(`IP \`${process.env.GWROK_IP.replace(/\./g, '\\.')}\`\nPort \`${ephPort}\``);
-// 		const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=${text}`;
-//                 fetch(`${process.env.BASE_URL}/sendMessage?${param}`)
-// 			.catch(console.log)
-// 			.then(res => res.json())
-// 	}
-// });
-
-function keepAlive(port) {
-	const socket = new net.Socket();
-	socket.connect(port, process.env.GWROK_IP, () => socket.destroy())
-	socket.on("error", console.log);
-}
+setInterval(() => {
+  recursion();
+}, 1000);
 
 ssh.stdout.on('data', (data) => {
-	if (data.toString().startsWith('Excellent')) {
-		const ephPort = data.toString().split(':')[2];
-		const text = encodeURIComponent(`IP \`${process.env.GWROK_IP.replace(/\./g, '\\.')}\`\nPort \`${ephPort}\``);
-		const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=${text}`;
-		fetch(`${process.env.BASE_URL}/sendMessage?${param}`)
-		.catch(console.log)
+  if (data.toString().startsWith('Excellent')) {
+    const port = data.toString().split(':')[2];
+    const ephPort = port.slice(0, port.indexOf('\n'));
+    const text = encodeURIComponent(`*SSH*\nIP \`${process.env.GWROK_IP.replace(/\./g, '\\.')}\`\nPort \`${ephPort}\``);
+    const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=${text}`;
+    fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(console.log)
 
-		setInterval(() => {
-			console.log("called")
-			keepAlive(ephPort);
-		}, 1000);
-		// const keepAlive = spawn('./keep-alive.sh', [ephPort]);
-		// todo: figure out ephPort
-		// keepAlive.stdout.on('data', (data) => {
-		// 	if (data.toString() == 1) {
-		// // make sure to start the service first. So keep alive will not complaint.
-		// const error = encodeURIComponent('*Alert*: something went wrong\\!\nPlease check your mini\\-serper \\>///<');
-		// const param = `chat_id=5599651385&parse_mode=MarkdownV2&text=${error}`;
-		// fetch(`${process.env.BASE_URL}/sendMessage?${param}`)
-		// 	.catch(console.log)
-		// 	.then(res => process.exit());
-		// 	}
-		// });
-	}
+    const intervalId = setInterval(() => keepAlive(ephPort, intervalId), 1000 * process.env.KEEPALIVE_TIMEOUT);
+  }
 });
 
+http.stdout.on('data', (data) => {
+  if (data.toString().startsWith('Excellent')) {
+    const port = data.toString().split(':')[2];
+    const ephPort = port.slice(0, port.indexOf('\n'));
+    const text = encodeURIComponent(`*HTTP*\nIP \`${process.env.GWROK_IP.replace(/\./g, '\\.')}\`\nPort \`${ephPort}\``);
+    const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=${text}`;
+    fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(console.log)
 
+    const intervalId = setInterval(() => keepAlive(ephPort, intervalId), 1000 * process.env.KEEPALIVE_TIMEOUT);
+  }
+});
 
+function keepAlive(port, intervalId) {
+  const socket = new net.Socket();
+  socket.setTimeout(1000);
+  socket.connect(port, process.env.GWROK_IP, () => socket.destroy())
+  socket.on("timeout", () => {
+    clearInterval(intervalId)
+    const error = encodeURIComponent('*Alert*: something went wrong\\!\nPlease check your mini\\-serper \\>///<');
+    const param = `chat_id=5599651385&parse_mode=MarkdownV2&text=${error}`;
+    fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(console.log)
+  });
+}
 
+function escapeSpecialChar(text) {
+  const regex = /[_*\[\]~`()>\#\-={}|!.]/g;
+  return text.replace(regex, '\\$&');
+}
