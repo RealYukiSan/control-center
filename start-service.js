@@ -90,7 +90,7 @@ socket.setTimeout(1000);
 socket.connect(port, process.env.GWROK_IP, () => socket.destroy())
 socket.on("timeout", () => {
 clearInterval(intervalId)
-const error = encodeURIComponent('*Alert*: something went wrong\\!\nPlease check your mini\\-serper \\>///<');
+const error = encodeURIComponent(escapeSpecialChar(`*Alert*: Keep Alive stopped for port ${port}!\nPlease check your mini-serper >///<`));
 const param = `chat_id=5599651385&parse_mode=MarkdownV2&text=${error}`;
 fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(console.log)
 });
