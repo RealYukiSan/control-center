@@ -6,29 +6,6 @@ const fs = require('node:fs');
 const { get } = require('node:https');
 require('dotenv').config();
 
-const http = spawn('gwrok', [
-	'client',
-	'--target-addr',
-	'127.0.0.1',
-	'--target-port',
-	process.env.HTTP_PORT,
-	'--server-addr',
-	process.env.GWROK_IP,
-	'--server-port',
-	'9999',
-]);
-const ssh = spawn('gwrok', [
-	'client',
-	'--target-addr',
-	'127.0.0.1',
-	'--target-port',
-	process.env.SSH_PORT,
-	'--server-addr',
-	process.env.GWROK_IP,
-	'--server-port',
-	'9999',
-]);
-
 let last_update = '';
 async function handler() {
 	const param = `timeout=150&offset=${last_update}`;
@@ -106,43 +83,71 @@ setInterval(() => {
 	handler();
 }, 1000 * process.env.HANDLER_TIMEOUT);
 
-ssh.stdout.on('data', (data) => {
-	if (data.toString().startsWith('Excellent')) {
-		const port = data.toString().split(':')[2];
-		const ephPort = port.slice(0, port.indexOf('\n'));
-		const text = encodeURIComponent(
-			`*SSH*\nIP \`${process.env.GWROK_IP.replace(/\./g, '\\.')}\`\nPort \`${ephPort}\``
-		);
-		const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=${text}`;
-		fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(
-			console.log
-		);
+if (process.argv.includes('--ssh')) {
+	const ssh = spawn('gwrok', [
+		'client',
+		'--target-addr',
+		'127.0.0.1',
+		'--target-port',
+		process.env.SSH_PORT,
+		'--server-addr',
+		process.env.GWROK_IP,
+		'--server-port',
+		'9999',
+	]);
 
-		const intervalId = setInterval(
-			() => keepAlive(ephPort, intervalId),
-			1000 * process.env.KEEPALIVE_TIMEOUT
-		);
-	}
-});
+	ssh.stdout.on('data', (data) => {
+		if (data.toString().startsWith('Excellent')) {
+			const port = data.toString().split(':')[2];
+			const ephPort = port.slice(0, port.indexOf('\n'));
+			const text = encodeURIComponent(
+				`*SSH*\nIP \`${process.env.GWROK_IP.replace(/\./g, '\\.')}\`\nPort \`${ephPort}\``
+			);
+			const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=${text}`;
+			fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(
+				console.log
+			);
 
-http.stdout.on('data', (data) => {
-	if (data.toString().startsWith('Excellent')) {
-		const port = data.toString().split(':')[2];
-		const ephPort = port.slice(0, port.indexOf('\n'));
-		const text = encodeURIComponent(
-			`*HTTP*\nIP \`${process.env.GWROK_IP.replace(/\./g, '\\.')}\`\nPort \`${ephPort}\``
-		);
-		const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=${text}`;
-		fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(
-			console.log
-		);
+			const intervalId = setInterval(
+				() => keepAlive(ephPort, intervalId),
+				1000 * process.env.KEEPALIVE_TIMEOUT
+			);
+		}
+	});
+}
 
-		const intervalId = setInterval(
-			() => keepAlive(ephPort, intervalId),
-			1000 * process.env.KEEPALIVE_TIMEOUT
-		);
-	}
-});
+if (process.argv.includes('--http')) {
+	const http = spawn('gwrok', [
+		'client',
+		'--target-addr',
+		'127.0.0.1',
+		'--target-port',
+		process.env.HTTP_PORT,
+		'--server-addr',
+		process.env.GWROK_IP,
+		'--server-port',
+		'9999',
+	]);
+
+	http.stdout.on('data', (data) => {
+		if (data.toString().startsWith('Excellent')) {
+			const port = data.toString().split(':')[2];
+			const ephPort = port.slice(0, port.indexOf('\n'));
+			const text = encodeURIComponent(
+				`*HTTP*\nIP \`${process.env.GWROK_IP.replace(/\./g, '\\.')}\`\nPort \`${ephPort}\``
+			);
+			const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=${text}`;
+			fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(
+				console.log
+			);
+
+			const intervalId = setInterval(
+				() => keepAlive(ephPort, intervalId),
+				1000 * process.env.KEEPALIVE_TIMEOUT
+			);
+		}
+	});
+}
 
 function keepAlive(port, intervalId) {
 	const socket = new net.Socket();
