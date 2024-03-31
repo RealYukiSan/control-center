@@ -1,12 +1,23 @@
 {
   "name": "control-center",
   "version": "1.0.0",
-  "description": "",
+  "description": "lorem ipsum",
+  "lint-staged": {
+    "start-service.js": "prettier --write start-service.js"
+  },
+  "scripts": {
+    "prepare": "husky"
+  },
   "main": "start-service.js",
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "husky": "^8.0.0",
+    "lint-staged": "^15.2.2",
+    "prettier": "3.2.5"
   }
 }
