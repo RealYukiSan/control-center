@@ -158,7 +158,7 @@ function keepAlive(port, intervalId) {
 	socket.on('timeout', () => {
 		clearInterval(intervalId);
 		const error = encodeURIComponent(
-			'*Alert*: something went wrong\\!\nPlease check your mini\\-serper \\>///<'
+			escapeSpecialChar('*Alert*: something went wrong!\nPlease check your mini-serper >///<')
 		);
 		const param = `chat_id=5599651385&parse_mode=MarkdownV2&text=${error}`;
 		fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(
