@@ -32,7 +32,7 @@ async function handler() {
               exec.stdout.on('end', () => {
                 const text = encodeURIComponent(escapeSpecialChar(output));
                 const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=${text}`;
-                get(`${process.env.BASE_URL}/sendMessage?${param}`, res => res.on("error", console.log))
+                fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(console.log)
               });
               break;
               case "sudo":
@@ -42,7 +42,7 @@ async function handler() {
                 sudo.stdout.on('end', () => {
                   const text = encodeURIComponent(escapeSpecialChar(output));
                   const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=${text}`;
-                  get(`${process.env.BASE_URL}/sendMessage?${param}`, res => res.on("error", console.log))
+                  fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(console.log)
                 });
               break;
             default:
@@ -64,7 +64,7 @@ ssh.stdout.on('data', (data) => {
     const ephPort = port.slice(0, port.indexOf('\n'));
     const text = encodeURIComponent(`*SSH*\nIP \`${process.env.GWROK_IP.replace(/\./g, '\\.')}\`\nPort \`${ephPort}\``);
     const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=${text}`;
-    get(`${process.env.BASE_URL}/sendMessage?${param}`, res => res.on("error", console.log))
+    fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(console.log)
 
     const intervalId = setInterval(() => keepAlive(ephPort, intervalId), 1000 * process.env.KEEPALIVE_TIMEOUT);
   }
@@ -76,7 +76,7 @@ http.stdout.on('data', (data) => {
     const ephPort = port.slice(0, port.indexOf('\n'));
     const text = encodeURIComponent(`*HTTP*\nIP \`${process.env.GWROK_IP.replace(/\./g, '\\.')}\`\nPort \`${ephPort}\``);
     const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=${text}`;
-    get(`${process.env.BASE_URL}/sendMessage?${param}`, res => res.on("error", console.log))
+    fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(console.log)
 
     const intervalId = setInterval(() => keepAlive(ephPort, intervalId), 1000 * process.env.KEEPALIVE_TIMEOUT);
   }
@@ -90,7 +90,7 @@ function keepAlive(port, intervalId) {
     clearInterval(intervalId)
     const error = encodeURIComponent('*Alert*: something went wrong\\!\nPlease check your mini\\-serper \\>///<');
     const param = `chat_id=5599651385&parse_mode=MarkdownV2&text=${error}`;
-    get(`${process.env.BASE_URL}/sendMessage?${param}`, res => res.on("error", console.log))
+    fetch(`${process.env.BASE_URL}/sendMessage?${param}`).catch(console.log)
   });
 }
 
@@ -107,6 +107,9 @@ function fetch(url) {
           res.on("data", chunk => buff = Buffer.concat([buff, Buffer.from(chunk)]))
           res.on("error", reject)
           res.on("end", () => resolve(buff))
+      }).on("error", e => {
+        if (e.code != 'ETIMEDOUT') reject(e)
+        fetch(url).then(resolve).catch(reject)
       })
   })
 }
