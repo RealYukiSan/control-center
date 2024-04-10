@@ -1,4 +1,4 @@
-#!/usr/bin/node
+#!/usr/bin/env node
 
 const { spawn } = require('node:child_process');
 const net = require('node:net');
@@ -27,26 +27,42 @@ async function handler() {
 						.replace(/\s{2,}/g, ' ')
 						.split(' ');
 					if (prompt.length > 1) {
-						let output;
+						let output = '';
+						let error = '';
+						const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=`;
 						switch (prompt[0]) {
 							case 'exec':
 								const exec = spawn('sh', [
 									'-c',
 									prompt.splice(1).join(' '),
 								]);
-								output = '';
 								exec.stdout.on(
 									'data',
 									(chunk) => (output += chunk)
 								);
+								exec.stderr.on(
+									'data',
+									(chunk) => (error += chunk)
+								);
+								exec.stderr.on('close', () => {
+									if (error) {
+										error = encodeURIComponent(
+											escapeSpecialChar(error)
+										);
+										fetch(
+											`${process.env.BASE_URL}/sendMessage?${param + error}`
+										).catch(console.log);
+									}
+								});
 								exec.stdout.on('end', () => {
-									const text = encodeURIComponent(
-										escapeSpecialChar(output)
-									);
-									const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=${text}`;
-									fetch(
-										`${process.env.BASE_URL}/sendMessage?${param}`
-									).catch(console.log);
+									if (output) {
+										const text = encodeURIComponent(
+											escapeSpecialChar(output)
+										);
+										fetch(
+											`${process.env.BASE_URL}/sendMessage?${param + text}`
+										).catch(console.log);
+									}
 								});
 								break;
 							case 'sudo':
@@ -54,19 +70,33 @@ async function handler() {
 									'-c',
 									`echo ${process.env.SUDO_PW} | sudo -S ${prompt.splice(1).join(' ')}`,
 								]);
-								output = '';
 								sudo.stdout.on(
 									'data',
 									(chunk) => (output += chunk)
 								);
+								sudo.stderr.on(
+									'data',
+									(chunk) => (error += chunk)
+								);
+								sudo.stderr.on('end', () => {
+									if (error) {
+										error = encodeURIComponent(
+											escapeSpecialChar(error)
+										);
+										fetch(
+											`${process.env.BASE_URL}/sendMessage?${param + error}`
+										).catch(console.log);
+									}
+								});
 								sudo.stdout.on('end', () => {
-									const text = encodeURIComponent(
-										escapeSpecialChar(output)
-									);
-									const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=${text}`;
-									fetch(
-										`${process.env.BASE_URL}/sendMessage?${param}`
-									).catch(console.log);
+									if (output) {
+										const text = encodeURIComponent(
+											escapeSpecialChar(output)
+										);
+										fetch(
+											`${process.env.BASE_URL}/sendMessage?${param + text}`
+										).catch(console.log);
+									}
 								});
 								break;
 							default:
