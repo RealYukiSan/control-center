@@ -49,19 +49,39 @@ async function handler() {
 										error = encodeURIComponent(
 											escapeSpecialChar(error)
 										);
-										fetch(
-											`${process.env.BASE_URL}/sendMessage?${param + error}`
-										).catch(console.log);
+
+										if (error.length > 4096) {
+											error = error.match(/.{1,4096}/g);
+											error.forEach((item) => {
+												fetch(
+													`${process.env.BASE_URL}/sendMessage?${param + item}`
+												);
+											});
+										} else {
+											fetch(
+												`${process.env.BASE_URL}/sendMessage?${param + error}`
+											).catch(console.log);
+										}
 									}
 								});
 								exec.stdout.on('end', () => {
 									if (output) {
-										const text = encodeURIComponent(
+										output = encodeURIComponent(
 											escapeSpecialChar(output)
 										);
-										fetch(
-											`${process.env.BASE_URL}/sendMessage?${param + text}`
-										).catch(console.log);
+
+										if (output.length > 4096) {
+											output = output.match(/.{1,4096}/g);
+											output.forEach((item) => {
+												fetch(
+													`${process.env.BASE_URL}/sendMessage?${param + item}`
+												);
+											});
+										} else {
+											fetch(
+												`${process.env.BASE_URL}/sendMessage?${param + output}`
+											).catch(console.log);
+										}
 									}
 								});
 								break;
@@ -83,19 +103,37 @@ async function handler() {
 										error = encodeURIComponent(
 											escapeSpecialChar(error)
 										);
-										fetch(
-											`${process.env.BASE_URL}/sendMessage?${param + error}`
-										).catch(console.log);
+										if (error.length > 4096) {
+											error = error.match(/.{1,4096}/g);
+											error.forEach((item) => {
+												fetch(
+													`${process.env.BASE_URL}/sendMessage?${param + item}`
+												);
+											});
+										} else {
+											fetch(
+												`${process.env.BASE_URL}/sendMessage?${param + error}`
+											).catch(console.log);
+										}
 									}
 								});
 								sudo.stdout.on('end', () => {
 									if (output) {
-										const text = encodeURIComponent(
+										output = encodeURIComponent(
 											escapeSpecialChar(output)
 										);
-										fetch(
-											`${process.env.BASE_URL}/sendMessage?${param + text}`
-										).catch(console.log);
+										if (output.length > 4096) {
+											output = output.match(/.{1,4096}/g);
+											output.forEach((item) => {
+												fetch(
+													`${process.env.BASE_URL}/sendMessage?${param + item}`
+												);
+											});
+										} else {
+											fetch(
+												`${process.env.BASE_URL}/sendMessage?${param + output}`
+											).catch(console.log);
+										}
 									}
 								});
 								break;
