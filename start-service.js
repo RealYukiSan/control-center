@@ -29,7 +29,7 @@ async function handler() {
 					if (prompt.length > 1) {
 						let output = '';
 						let error = '';
-						const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkdownV2&text=`;
+						const param = `chat_id=${process.env.OWNER_ID}&text=`;
 						switch (prompt[0]) {
 							case 'exec':
 								const exec = spawn('sh', [
@@ -44,7 +44,7 @@ async function handler() {
 									'data',
 									(chunk) => (error += chunk)
 								);
-								exec.stderr.on('close', () => {
+								exec.stderr.on('end', () => {
 									if (error) {
 										error = encodeURIComponent(
 											escapeSpecialChar(error)
