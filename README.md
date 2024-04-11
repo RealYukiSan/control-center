@@ -35,7 +35,7 @@ read [the gist](https://gist.github.com/RealYukiSan/1e0ad1fc07c41b26b0d54986f248
 ### monitoring running process
 
 ```
-ps -eF | grep -v 'kworker\|systemd' | less
+ps -eF | grep -v '\[*\]' | less
 ```
 
 filter the list that omit the word 'kworker' and 'systemd' to shorten the list
