@@ -15,7 +15,8 @@ setsid start-service.js &>/tmp/start-service.log </dev/null
 
 optional, add soft-link to executable:
 ```
-ln -s $(pwd)/start-service.js /usr/local/bin/start-service
+ln -vs $(pwd)/start-service.js /usr/local/bin/start-service
+chmod +x /usr/local/bin/start-service
 ```
 
 ## Setup telegram bot
