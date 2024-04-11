@@ -46,9 +46,7 @@ async function handler() {
 								);
 								exec.once('exit', () => {
 									if (error) {
-										error = encodeURIComponent(
-											escapeSpecialChar(error)
-										);
+										error = encodeURIComponent(error);
 
 										if (error.length > 4096) {
 											error = error.match(/.{1,4096}/g);
@@ -65,9 +63,7 @@ async function handler() {
 									}
 
 									if (output) {
-										output = encodeURIComponent(
-											escapeSpecialChar(output)
-										);
+										output = encodeURIComponent(output);
 
 										if (output.length > 4096) {
 											output = output.match(/.{1,4096}/g);
@@ -99,9 +95,7 @@ async function handler() {
 								);
 								sudo.once('exit', () => {
 									if (error) {
-										error = encodeURIComponent(
-											escapeSpecialChar(error)
-										);
+										error = encodeURIComponent(error);
 										if (error.length > 4096) {
 											error = error.match(/.{1,4096}/g);
 											error.forEach((item) => {
@@ -117,9 +111,7 @@ async function handler() {
 									}
 
 									if (output) {
-										output = encodeURIComponent(
-											escapeSpecialChar(output)
-										);
+										output = encodeURIComponent(output);
 										if (output.length > 4096) {
 											output = output.match(/.{1,4096}/g);
 											output.forEach((item) => {
