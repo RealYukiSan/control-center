@@ -37,7 +37,7 @@ read [the gist](https://gist.github.com/RealYukiSan/1e0ad1fc07c41b26b0d54986f248
 ```bash
 ps -eF | grep -v '\[*\]' | less
 # or
-ps --ppid 2 -p 2 --deselect | less
+ps -F --ppid 2 -p 2 --deselect | less
 ```
 
 filter the list that only display non-kernel process in order to shorten the list, reference: [stackoverflow](https://unix.stackexchange.com/questions/78583/can-ps-display-only-non-kernel-processes-on-linux)
