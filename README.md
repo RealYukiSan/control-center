@@ -50,3 +50,8 @@ ps -F --ppid 2 -p 2 --deselect | less
 ```
 
 filter the list that only display non-kernel process in order to shorten the list, reference: [stackoverflow](https://unix.stackexchange.com/questions/78583/can-ps-display-only-non-kernel-processes-on-linux)
+
+## Question
+
+- wondering why the `sh -c` not exit when I execute `setsid` program?
+- and wondering why, isolating chain of command to `respawn.sh` and call `sh -c setsid` works like a charm? unlike call it directly with `sh -c`
