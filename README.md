@@ -1,5 +1,8 @@
 # Control center for my super-duper tiny-mini serper XD
 
+## Requirement
+stable Node.js version.
+
 ## Usage
 
 ```
@@ -8,6 +11,11 @@ cd control-center
 touch track_message
 chmod +x start-service.js
 setsid start-service.js &>/tmp/start-service.log </dev/null
+```
+
+optional, add soft-link to executable:
+```
+ln -s $(pwd)/start-service.js /usr/local/bin/start-service
 ```
 
 ## Setup telegram bot
