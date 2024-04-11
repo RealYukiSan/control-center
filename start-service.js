@@ -44,7 +44,7 @@ async function handler() {
 									'data',
 									(chunk) => (error += chunk)
 								);
-								exec.stderr.on('end', () => {
+								exec.once('exit', () => {
 									if (error) {
 										error = encodeURIComponent(
 											escapeSpecialChar(error)
@@ -63,8 +63,7 @@ async function handler() {
 											).catch(console.log);
 										}
 									}
-								});
-								exec.stdout.on('end', () => {
+
 									if (output) {
 										output = encodeURIComponent(
 											escapeSpecialChar(output)
@@ -98,7 +97,7 @@ async function handler() {
 									'data',
 									(chunk) => (error += chunk)
 								);
-								sudo.stderr.on('end', () => {
+								sudo.once('exit', () => {
 									if (error) {
 										error = encodeURIComponent(
 											escapeSpecialChar(error)
@@ -116,8 +115,7 @@ async function handler() {
 											).catch(console.log);
 										}
 									}
-								});
-								sudo.stdout.on('end', () => {
+
 									if (output) {
 										output = encodeURIComponent(
 											escapeSpecialChar(output)
