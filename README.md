@@ -32,10 +32,10 @@ see [the gist](https://gist.github.com/RealYukiSan/e0feea6d8fbf1b0963bab570e5828
 
 ### execute via telegram bot
 
-fetch newest update from git remote and restart the bot (*NEED UPDATE, NOT WORK!*):
+fetch newest update from git remote and restart the bot:
 
 ```
-exec git pull && kill $(ps aux | grep start-service | awk '{print $2}' | head -1) && setsid start-service.js &>/tmp/control-center.log </dev/null;exit
+exec setsid ./respawn.sh
 ```
 
 ### ngrok
