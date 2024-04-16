@@ -160,8 +160,8 @@ function fetch(link) {
 			res.on('end', () => resolve(buff));
 		}).on('error', (e) => {
 			if (e.name == 'AggregateError') {
-				for (let index = 0; index < error.errors.length; index++) {
-					switch (error.errors[i].cause.code) {
+				for (let index = 0; index < e.errors.length; index++) {
+					switch (e.errors[i].cause.code) {
 						case 'ENETUNREACH':
 						case 'ETIMEDOUT':
 							console.log('Bad internet connection, retry...');
@@ -172,7 +172,7 @@ function fetch(link) {
 						default:
 							console.log(
 								'unknown error code: %s',
-								error.errors[i].cause.code
+								e.errors[i].cause.code
 							);
 							break;
 					}
