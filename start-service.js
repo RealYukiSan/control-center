@@ -28,7 +28,7 @@ async function handler() {
 					if (prompt.length > 1) {
 						let output = '';
 						let error = '';
-						const param = `chat_id=${process.env.OWNER_ID}&text=`;
+						const param = `chat_id=${process.env.OWNER_ID}&parse_mode=MarkDownV2&text=`;
 						switch (prompt[0]) {
 							case 'exec':
 								const exec = spawn('sh', [
@@ -45,7 +45,9 @@ async function handler() {
 								);
 								exec.once('exit', () => {
 									if (error) {
-										error = encodeURIComponent(error);
+										error = encodeURIComponent(
+											escapeSpecialChar(error)
+										);
 
 										if (error.length > 4096) {
 											error = error.match(/.{1,4096}/g);
@@ -62,7 +64,9 @@ async function handler() {
 									}
 
 									if (output) {
-										output = encodeURIComponent(output);
+										output = encodeURIComponent(
+											escapeSpecialChar(output)
+										);
 
 										if (output.length > 4096) {
 											output = output.match(/.{1,4096}/g);
@@ -94,7 +98,9 @@ async function handler() {
 								);
 								sudo.once('exit', () => {
 									if (error) {
-										error = encodeURIComponent(error);
+										error = encodeURIComponent(
+											escapeSpecialChar(error)
+										);
 										if (error.length > 4096) {
 											error = error.match(/.{1,4096}/g);
 											error.forEach((item) => {
@@ -110,7 +116,9 @@ async function handler() {
 									}
 
 									if (output) {
-										output = encodeURIComponent(output);
+										output = encodeURIComponent(
+											escapeSpecialChar(output)
+										);
 										if (output.length > 4096) {
 											output = output.match(/.{1,4096}/g);
 											output.forEach((item) => {
@@ -174,4 +182,10 @@ function fetch(link) {
 			fetch(link).then(resolve).catch(reject);
 		});
 	});
+}
+
+function escapeSpecialChar(text) {
+	// '_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'
+	const regex = /[\_\*\[\]\~\`\(\)\>\#\+\-\=\{\}\|\!\.]/g;
+	return text.replace(regex, '\\$&');
 }
