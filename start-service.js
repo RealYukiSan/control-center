@@ -46,16 +46,14 @@ async function handler() {
 								exec.once('exit', () => {
 									if (error) {
 										error = encodeURIComponent(
-											'```bash\n' +
-												escapeSpecialChar(error) +
-												'```'
+											escapeSpecialChar(error)
 										);
 
 										if (error.length > 4096) {
 											error = error.match(/.{1,4096}/g);
 											error.forEach((item) => {
 												fetch(
-													`${process.env.BASE_URL}/sendMessage?${param + item}`
+													`${process.env.BASE_URL}/sendMessage?${param + '```bash\n' + item + '```'}`
 												);
 											});
 										} else {
@@ -67,16 +65,14 @@ async function handler() {
 
 									if (output) {
 										output = encodeURIComponent(
-											'```bash\n' +
-												escapeSpecialChar(output) +
-												'```'
+											escapeSpecialChar(output)
 										);
 
 										if (output.length > 4096) {
 											output = output.match(/.{1,4096}/g);
 											output.forEach((item) => {
 												fetch(
-													`${process.env.BASE_URL}/sendMessage?${param + item}`
+													`${process.env.BASE_URL}/sendMessage?${param + '```bash\n' + item + '```'}`
 												);
 											});
 										} else {
@@ -103,15 +99,13 @@ async function handler() {
 								sudo.once('exit', () => {
 									if (error) {
 										error = encodeURIComponent(
-											'```bash\n' +
-												escapeSpecialChar(error) +
-												'```'
+											escapeSpecialChar(error)
 										);
 										if (error.length > 4096) {
 											error = error.match(/.{1,4096}/g);
 											error.forEach((item) => {
 												fetch(
-													`${process.env.BASE_URL}/sendMessage?${param + item}`
+													`${process.env.BASE_URL}/sendMessage?${param + '```bash\n' + item + '```'}`
 												);
 											});
 										} else {
@@ -123,15 +117,13 @@ async function handler() {
 
 									if (output) {
 										output = encodeURIComponent(
-											'```bash\n' +
-												escapeSpecialChar(output) +
-												'```'
+											escapeSpecialChar(output)
 										);
 										if (output.length > 4096) {
 											output = output.match(/.{1,4096}/g);
 											output.forEach((item) => {
 												fetch(
-													`${process.env.BASE_URL}/sendMessage?${param + item}`
+													`${process.env.BASE_URL}/sendMessage?${param + '```bash\n' + item + '```'}`
 												);
 											});
 										} else {
