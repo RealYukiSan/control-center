@@ -140,9 +140,9 @@ setInterval(() => {
 	handler();
 }, 1000 * process.env.HANDLER_TIMEOUT);
 
-function fetch(url) {
+function fetch(link) {
 	return new Promise((resolve, reject) => {
-		get(url, (res) => {
+		get(link, { timeout: 60e3 }, (res) => {
 			let buff = Buffer.alloc(0);
 			res.on(
 				'data',
@@ -151,8 +151,9 @@ function fetch(url) {
 			res.on('error', reject);
 			res.on('end', () => resolve(buff));
 		}).on('error', (e) => {
-			if (e.code != 'ETIMEDOUT') reject(e);
-			fetch(url).then(resolve).catch(reject);
+			if (e.code != 'ECONNRESET') reject(e);
+			console.log('warn: peer decided to close socket!');
+			fetch(link).then(resolve).catch(reject);
 		});
 	});
 }
