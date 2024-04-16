@@ -45,18 +45,26 @@ async function handler() {
 								);
 								exec.once('exit', () => {
 									if (error) {
-										error = encodeURIComponent(
-											escapeSpecialChar(error)
-										);
-
 										if (error.length > 4096) {
-											error = error.match(/.{1,4096}/g);
+											error = chunkSubstr(error, 4096);
 											error.forEach((item) => {
+												item = encodeURIComponent(
+													'```bash\n' +
+														escapeSpecialChar(
+															item
+														) +
+														'```'
+												);
 												fetch(
-													`${process.env.BASE_URL}/sendMessage?${param + '```bash\n' + item + '```'}`
+													`${process.env.BASE_URL}/sendMessage?${param + item}`
 												);
 											});
 										} else {
+											error = encodeURIComponent(
+												'```bash\n' +
+													escapeSpecialChar(error) +
+													'```'
+											);
 											fetch(
 												`${process.env.BASE_URL}/sendMessage?${param + error}`
 											).catch(console.log);
@@ -64,18 +72,26 @@ async function handler() {
 									}
 
 									if (output) {
-										output = encodeURIComponent(
-											escapeSpecialChar(output)
-										);
-
 										if (output.length > 4096) {
-											output = output.match(/.{1,4096}/g);
+											output = chunkSubstr(output, 4096);
 											output.forEach((item) => {
+												item = encodeURIComponent(
+													'```bash\n' +
+														escapeSpecialChar(
+															item
+														) +
+														'```'
+												);
 												fetch(
-													`${process.env.BASE_URL}/sendMessage?${param + '```bash\n' + item + '```'}`
+													`${process.env.BASE_URL}/sendMessage?${param + item}`
 												);
 											});
 										} else {
+											output = encodeURIComponent(
+												'```bash\n' +
+													escapeSpecialChar(output) +
+													'```'
+											);
 											fetch(
 												`${process.env.BASE_URL}/sendMessage?${param + output}`
 											).catch(console.log);
@@ -98,17 +114,26 @@ async function handler() {
 								);
 								sudo.once('exit', () => {
 									if (error) {
-										error = encodeURIComponent(
-											escapeSpecialChar(error)
-										);
 										if (error.length > 4096) {
-											error = error.match(/.{1,4096}/g);
+											error = chunkSubstr(error, 4096);
 											error.forEach((item) => {
+												item = encodeURIComponent(
+													'```bash\n' +
+														escapeSpecialChar(
+															item
+														) +
+														'```'
+												);
 												fetch(
-													`${process.env.BASE_URL}/sendMessage?${param + '```bash\n' + item + '```'}`
+													`${process.env.BASE_URL}/sendMessage?${param + item}`
 												);
 											});
 										} else {
+											error = encodeURIComponent(
+												'```bash\n' +
+													escapeSpecialChar(error) +
+													'```'
+											);
 											fetch(
 												`${process.env.BASE_URL}/sendMessage?${param + error}`
 											).catch(console.log);
@@ -116,17 +141,26 @@ async function handler() {
 									}
 
 									if (output) {
-										output = encodeURIComponent(
-											escapeSpecialChar(output)
-										);
 										if (output.length > 4096) {
-											output = output.match(/.{1,4096}/g);
+											output = chunkSubstr(output, 4096);
 											output.forEach((item) => {
+												item = encodeURIComponent(
+													'```bash\n' +
+														escapeSpecialChar(
+															item
+														) +
+														'```'
+												);
 												fetch(
-													`${process.env.BASE_URL}/sendMessage?${param + '```bash\n' + item + '```'}`
+													`${process.env.BASE_URL}/sendMessage?${param + item}`
 												);
 											});
 										} else {
+											output = encodeURIComponent(
+												'```bash\n' +
+													escapeSpecialChar(output) +
+													'```'
+											);
 											fetch(
 												`${process.env.BASE_URL}/sendMessage?${param + output}`
 											).catch(console.log);
@@ -188,4 +222,15 @@ function escapeSpecialChar(text) {
 	// '_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'
 	const regex = /[\_\*\[\]\~\`\(\)\>\#\+\-\=\{\}\|\!\.]/g;
 	return text.replace(regex, '\\$&');
+}
+
+function chunkSubstr(str, size) {
+	const numChunks = Math.ceil(str.length / size);
+	const chunks = new Array(numChunks);
+
+	for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
+		chunks[i] = str.substr(o, size);
+	}
+
+	return chunks;
 }
