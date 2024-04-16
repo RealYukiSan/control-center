@@ -46,7 +46,9 @@ async function handler() {
 								exec.once('exit', () => {
 									if (error) {
 										error = encodeURIComponent(
-											escapeSpecialChar(error)
+											'```bash\n' +
+												escapeSpecialChar(error) +
+												'```'
 										);
 
 										if (error.length > 4096) {
@@ -65,7 +67,9 @@ async function handler() {
 
 									if (output) {
 										output = encodeURIComponent(
-											escapeSpecialChar(output)
+											'```bash\n' +
+												escapeSpecialChar(output) +
+												'```'
 										);
 
 										if (output.length > 4096) {
@@ -99,7 +103,9 @@ async function handler() {
 								sudo.once('exit', () => {
 									if (error) {
 										error = encodeURIComponent(
-											escapeSpecialChar(error)
+											'```bash\n' +
+												escapeSpecialChar(error) +
+												'```'
 										);
 										if (error.length > 4096) {
 											error = error.match(/.{1,4096}/g);
@@ -117,7 +123,9 @@ async function handler() {
 
 									if (output) {
 										output = encodeURIComponent(
-											escapeSpecialChar(output)
+											'```bash\n' +
+												escapeSpecialChar(output) +
+												'```'
 										);
 										if (output.length > 4096) {
 											output = output.match(/.{1,4096}/g);
