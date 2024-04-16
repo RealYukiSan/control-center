@@ -43,11 +43,12 @@ async function handler() {
 									'data',
 									(chunk) => (error += chunk)
 								);
-								exec.once('exit', () => {
+								exec.once('exit', async () => {
 									if (error) {
 										if (error.length > 4096) {
 											error = chunkSubstr(error, 4096);
-											error.forEach((item) => {
+											for (const key in error) {
+												let item = error[key];
 												item = encodeURIComponent(
 													'```bash\n' +
 														escapeSpecialChar(
@@ -55,10 +56,10 @@ async function handler() {
 														) +
 														'```'
 												);
-												fetch(
+												await fetch(
 													`${process.env.BASE_URL}/sendMessage?${param + item}`
 												);
-											});
+											}
 										} else {
 											error = encodeURIComponent(
 												'```bash\n' +
@@ -74,7 +75,9 @@ async function handler() {
 									if (output) {
 										if (output.length > 4096) {
 											output = chunkSubstr(output, 4096);
-											output.forEach((item) => {
+
+											for (const key in output) {
+												let item = output[key];
 												item = encodeURIComponent(
 													'```bash\n' +
 														escapeSpecialChar(
@@ -82,10 +85,10 @@ async function handler() {
 														) +
 														'```'
 												);
-												fetch(
+												await fetch(
 													`${process.env.BASE_URL}/sendMessage?${param + item}`
 												);
-											});
+											}
 										} else {
 											output = encodeURIComponent(
 												'```bash\n' +
@@ -112,11 +115,12 @@ async function handler() {
 									'data',
 									(chunk) => (error += chunk)
 								);
-								sudo.once('exit', () => {
+								sudo.once('exit', async () => {
 									if (error) {
 										if (error.length > 4096) {
 											error = chunkSubstr(error, 4096);
-											error.forEach((item) => {
+											for (const key in error) {
+												let item = error[key];
 												item = encodeURIComponent(
 													'```bash\n' +
 														escapeSpecialChar(
@@ -124,10 +128,10 @@ async function handler() {
 														) +
 														'```'
 												);
-												fetch(
+												await fetch(
 													`${process.env.BASE_URL}/sendMessage?${param + item}`
 												);
-											});
+											}
 										} else {
 											error = encodeURIComponent(
 												'```bash\n' +
@@ -143,7 +147,9 @@ async function handler() {
 									if (output) {
 										if (output.length > 4096) {
 											output = chunkSubstr(output, 4096);
-											output.forEach((item) => {
+
+											for (const key in output) {
+												let item = output[key];
 												item = encodeURIComponent(
 													'```bash\n' +
 														escapeSpecialChar(
@@ -151,10 +157,10 @@ async function handler() {
 														) +
 														'```'
 												);
-												fetch(
+												await fetch(
 													`${process.env.BASE_URL}/sendMessage?${param + item}`
 												);
-											});
+											}
 										} else {
 											output = encodeURIComponent(
 												'```bash\n' +
