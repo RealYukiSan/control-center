@@ -151,8 +151,26 @@ function fetch(link) {
 			res.on('error', reject);
 			res.on('end', () => resolve(buff));
 		}).on('error', (e) => {
-			if (e.code != 'ECONNRESET') reject(e);
-			console.log('warn: peer decided to close socket!');
+			if (e.name == 'AggregateError') {
+				for (let index = 0; index < error.errors.length; index++) {
+					switch (error.errors[i].cause.code) {
+						case 'ENETUNREACH':
+						case 'ETIMEDOUT':
+							console.log('Bad internet connection, retry...');
+							break;
+						case 'ECONNRESET':
+							console.log('warn: peer decided to close socket!');
+							break;
+						default:
+							console.log(
+								'unknown error code: %s',
+								error.errors[i].cause.code
+							);
+							break;
+					}
+				}
+			} else if (e.code == 'ECONNRESET')
+				console.log('warn: peer decided to close socket! retry...');
 			fetch(link).then(resolve).catch(reject);
 		});
 	});
