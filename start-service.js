@@ -207,7 +207,9 @@ function fetch(link) {
 							console.log('Bad internet connection, retry...');
 							break;
 						case 'ECONNRESET':
-							console.log('warn: peer decided to close socket!');
+							console.log(
+								'warn: peer decided to close socket! retry...'
+							);
 							break;
 						default:
 							console.log(
