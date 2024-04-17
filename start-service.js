@@ -174,6 +174,12 @@ async function handler() {
 									}
 								});
 								break;
+							case 'pacman':
+								spawn('sh', [
+									'-c',
+									`setsid ./respawn.sh ${process.env.BASE_URL} ${process.env.OWNER_ID}`,
+								]);
+								break;
 							default:
 								break;
 						}
