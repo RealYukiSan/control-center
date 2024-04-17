@@ -204,23 +204,31 @@ function fetch(link) {
 					switch (e.errors[index].code) {
 						case 'ENETUNREACH':
 						case 'ETIMEDOUT':
-							console.log('Bad internet connection, retry...');
+							console.log(
+								'Bad internet connection: %s! retry...',
+								e.errors[index].code
+							);
 							break;
 						case 'ECONNRESET':
 							console.log(
-								'warn: peer decided to close socket! retry...'
+								'Peer decided to close socket: %s! retry...',
+								e.errors[index].code
 							);
 							break;
 						default:
 							console.log(
-								'unknown error code: %s',
+								'Unhandled error code: %s! retry...',
 								e.errors[index].code
 							);
-							break;
 					}
 				}
-			} else if (e.code == 'ECONNRESET')
-				console.log('warn: peer decided to close socket! retry...');
+			} else if (e.code == 'ECONNRESET') {
+				console.log(
+					'Peer decided to close socket: %s! retry...',
+					e.code
+				);
+			} else console.log('Unhandled error code: %s! retry...', e.code);
+
 			fetch(link).then(resolve).catch(reject);
 		});
 	});
